@@ -4,6 +4,9 @@ import blessed from 'blessed';
 
 function noop() {}
 
+const TEXT =
+    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
+
 new Server(
     {
         hostKeys: [fs.readFileSync('key')],
@@ -71,14 +74,12 @@ new Server(
                                 height: 1,
                                 top: 0,
                                 left: 0,
-                                width: '100%',
+                                right: 0,
                                 tags: true,
                                 type: 'line',
                             });
                             screen.append(textBox);
 
-                            const TEXT =
-                                'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
                             let comingText = TEXT;
                             let userText = '';
                             let nextChar = comingText.charAt(0);
@@ -86,7 +87,18 @@ new Server(
                             textBox.setContent(
                                 `{blue-bg}${nextChar}{/blue-bg}${comingText}`
                             );
+                            let index = 0;
                             screen.on('keypress', function (key) {
+                                index++;
+                                if (
+                                    index > cols / 2 &&
+                                    comingText.length > cols / 2
+                                ) {
+                                    userText = userText.replace(
+                                        new RegExp('^{.+?}.{/.+?}'),
+                                        ''
+                                    );
+                                }
                                 const corr = nextChar === key;
                                 const startTag = corr
                                     ? '{green-fg}'
