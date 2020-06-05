@@ -1,5 +1,5 @@
 import { Connection, AuthContext } from 'ssh2';
-import Player from './player';
+import Player from './Player';
 
 export default class Game {
     private players: Player[] = [];
