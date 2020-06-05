@@ -1,8 +1,8 @@
 import { Connection, AuthContext } from 'ssh2';
-import Player from './Player';
+import Client from './Client';
 
 export default class Game {
-    private players: Player[] = [];
+    private clients: Client[] = [];
 
     constructor() {}
 
@@ -15,14 +15,14 @@ export default class Game {
             })
             .on('ready', () => {
                 console.log('New Client:', clientId);
-                this.players.push(new Player(clientId, client));
+                this.clients.push(new Client(clientId, client));
             })
             .on('end', () => {
-                const index = this.players.findIndex(
-                    (player) => player.id === clientId
+                const index = this.clients.findIndex(
+                    (client) => client.id === clientId
                 );
                 if (index !== -1) {
-                    this.players.splice(index, 1);
+                    this.clients.splice(index, 1);
                 }
                 console.log('Client disconnected:', clientId);
             })
