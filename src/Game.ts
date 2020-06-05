@@ -3,8 +3,14 @@ import Client from './Client';
 
 export default class Game {
     private clients: Client[] = [];
+    private intervalId: NodeJS.Timeout;
 
-    constructor() {}
+    constructor() {
+        this.intervalId = setInterval(() => {
+            this.update();
+            this.render();
+        }, 500);
+    }
 
     public newClient(client: Connection): void {
         // TODO: Create a proper unique ID
@@ -29,5 +35,14 @@ export default class Game {
             .on('error', (error) => {
                 console.log(error);
             });
+    }
+
+    private update() {
+        const dataArray = this.clients.map((client) => client.sharedData());
+        this.clients.forEach((client) => client.update(dataArray));
+    }
+
+    private render() {
+        this.clients.forEach((client) => client.render());
     }
 }

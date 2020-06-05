@@ -2,12 +2,14 @@ import { Connection } from 'ssh2';
 
 import Player from './Player';
 import Screen from './Screen';
+import Race from './Race';
 
 function noop() {}
 
 export default class Client {
     private player: Player | null = null;
     private screen: Screen | null = null;
+    private race: Race;
     private cols: number = 80;
     private rows: number = 24;
     private term: string = 'ansi';
@@ -38,11 +40,28 @@ export default class Client {
                         cols: this.cols,
                         term: this.term,
                     });
-                    this.player = new Player(stream, this.screen);
-                    this.screen.append(this.player.widgets);
+                    this.player = new Player(this.id, this.screen);
+                    this.screen.append(this.player.box);
+                    this.race = new Race(this.screen);
+                    this.screen.append(this.race.box);
                     console.log('shelling');
                     this.screen.render();
                 });
         });
+    }
+
+    public sharedData(): SharedClientData {
+        return {
+            name: this.id.toString(),
+            percentage: this.player.percentage(),
+        };
+    }
+
+    public update(dataArray: SharedClientData[]) {
+        this.race.update(dataArray);
+    }
+
+    public render() {
+        this.screen.render();
     }
 }

@@ -27,8 +27,8 @@ export default class Screen {
         });
     }
 
-    public append(elements: any[]) {
-        elements.forEach((element) => this.screen.append(element));
+    public append(element: any) {
+        this.screen.append(element);
     }
 
     public render(): void {
