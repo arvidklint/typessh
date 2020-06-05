@@ -30,12 +30,4 @@ export default class Game {
                 console.log(error);
             });
     }
-
-    public removePlayer(): void {}
-
-    public update(): void {}
-
-    public render(): void {
-        this.players.forEach((player) => player.render());
-    }
 }
