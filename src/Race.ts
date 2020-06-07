@@ -16,7 +16,7 @@ export default class Race {
     constructor(private readonly screen: Screen) {
         this.box = blessed.box({
             screen: this.screen.screen,
-            top: 10,
+            top: 15,
             left: 1,
             right: 1,
             height: 10,

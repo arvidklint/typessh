@@ -5,18 +5,23 @@ const TEXT =
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
 
 const MAX_ERRORS = 5;
+const HORIZONTAL_PADDING = 3;
+const TEXT_PADDING = 2;
 
-export default class Text  {
+export default class Text {
     public box: blessed.Widgets.BoxElement;
+    private header: blessed.Widgets.BoxElement;
+    private body: blessed.Widgets.BoxElement;
     private stringLines: string[] = [];
     private lines: blessed.Widgets.BoxElement[] = [];
     private currentLine: number = 0;
     private currentCol: number = 0;
     private errorString: string = '';
+    private startTime: number = 0;
 
     constructor(public readonly id: number, private screen: Screen) {
         // Manually divide text into lines to fix line break bugs
-        const maxLength = this.screen.info.cols - 14;
+        const maxLength = this.width - TEXT_PADDING * 2 - MAX_ERRORS;
 
         this.stringLines = TEXT.split(' ').reduce(
             (acc: Array<string>, word: string) => {
@@ -39,15 +44,30 @@ export default class Text  {
 
         this.box = blessed.box({
             screen: this.screen.screen,
-            shadow: true,
             top: 5,
-            left: 5,
-            right: 5,
+            left: HORIZONTAL_PADDING,
+            right: HORIZONTAL_PADDING,
+        });
+
+        this.header = blessed.box({
+            parent: this.box,
+            top: 0,
+            left: 0,
+            right: 0,
+            type: 'line',
+        });
+
+        this.body = blessed.box({
+            parent: this.box,
+            top: 2,
+            left: TEXT_PADDING,
+            right: TEXT_PADDING,
+            height: this.stringLines.length,
         });
 
         this.lines = this.stringLines.map((str, index) => {
             return blessed.box({
-                parent: this.box,
+                parent: this.body,
                 top: index,
                 left: 0,
                 right: 0,
@@ -59,6 +79,14 @@ export default class Text  {
         });
 
         this.listen();
+    }
+
+    private get started(): boolean {
+        return this.startTime !== 0;
+    }
+
+    private get width(): number {
+        return this.screen.info.cols - HORIZONTAL_PADDING * 2;
     }
 
     private createContent(): string {
@@ -78,14 +106,24 @@ export default class Text  {
         return `${done}${next}${left}`;
     }
 
-    public render() {
+    private render(): void {
         this.lines[this.currentLine].setContent(this.createContent());
+        const TITLE = '——[ TypeSSH ]';
+        this.header.setContent(
+            TITLE +
+                `/ WPM: ${this.wpm()} /——`.padStart(
+                    this.width - TITLE.length,
+                    '—'
+                )
+        );
         this.screen.render();
     }
 
-    private listen() {
+    private listen(): void {
         this.render();
         this.screen.screen.on('keypress', (key, keyInfo) => {
+            if (!this.started) this.startTime = Date.now();
+
             if (this.currentLine > this.stringLines.length - 1) return;
 
             if (keyInfo.name === 'backspace') {
@@ -126,5 +164,20 @@ export default class Text  {
         }
         const total = this.currentCol + completed;
         return total / TEXT.length;
+    }
+
+    private wpm(): number {
+        if (!this.started) return 0;
+
+        const deltaTime = Date.now() - this.startTime;
+        let wordCount = 0;
+        for (let i = 0; i < this.currentLine; i++) {
+            wordCount += this.stringLines[i].split(' ').length;
+        }
+        wordCount +=
+            this.stringLines[this.currentLine]
+                .substring(0, this.currentCol)
+                .split(' ').length - 1;
+        return Math.round(((wordCount * 1000) / deltaTime) * 60);
     }
 }
