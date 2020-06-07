@@ -6,7 +6,7 @@ const TEXT =
 
 const MAX_ERRORS = 5;
 
-export default class Player {
+export default class Text  {
     public box: blessed.Widgets.BoxElement;
     private stringLines: string[] = [];
     private lines: blessed.Widgets.BoxElement[] = [];
