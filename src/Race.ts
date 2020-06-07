@@ -16,7 +16,7 @@ export default class Race {
     constructor(private readonly screen: Screen) {
         this.box = blessed.box({
             screen: this.screen.screen,
-            top: 5,
+            top: 10,
             left: 1,
             right: 1,
             height: 10,
@@ -49,10 +49,8 @@ export default class Race {
                 const width = this.screen.info.cols - 2 - PADDING_START - 1;
                 const padding = width * data.percentage;
                 const tag = TAGS[index];
-                const str = `${data.name.substring(0, 5)}`.padStart(
-                    padding + PADDING_START,
-                    ' '
-                );
+                const name = data.name.substring(0, PADDING_START);
+                const str = `${name}`.padStart(padding + PADDING_START, ' ');
                 return `{${tag}}${str}{/${tag}}`;
             })
             .join('\n\n');
