@@ -126,7 +126,6 @@ export default class Player {
             completed += this.stringLines[i].length;
         }
         const total = this.currentCol + completed;
-        console.log(total, '/', TEXT.length);
         return total / TEXT.length;
     }
 }
