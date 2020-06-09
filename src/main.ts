@@ -5,12 +5,12 @@ import Game from './Game';
 const game = new Game();
 new Server(
     {
-        hostKeys: [fs.readFileSync('key')],
+        hostKeys: [fs.readFileSync(process.env.KEY_PATH)],
     },
     function (client: Connection): void {
         game.newClient(client);
         console.log('Client connected');
     }
-).listen(9090, '127.0.0.1', function () {
+).listen(+process.env.PORT, process.env.HOST, function () {
     console.log('Listening on port ' + this.address().port);
 });
