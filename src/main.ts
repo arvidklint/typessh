@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { Server, Connection } from 'ssh2';
 import Game from './Game';
+import './db';
 
 const game = new Game();
 new Server(

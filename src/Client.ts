@@ -8,13 +8,16 @@ function noop() {}
 
 export default class Client {
     private text: Text | null = null;
-    private screen: Screen | null = null;
     private race: Race;
     private cols: number = 80;
     private rows: number = 24;
     private term: string = 'ansi';
 
-    constructor(public id: number, private conn: Connection) {
+    constructor(
+        public id: string,
+        private conn: Connection,
+        private screen: Screen
+    ) {
         this.listen();
     }
 

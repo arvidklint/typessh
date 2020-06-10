@@ -19,7 +19,7 @@ export default class Text {
     private errorString: string = '';
     private startTime: number = 0;
 
-    constructor(public readonly id: number, private screen: Screen) {
+    constructor(public readonly id: string, private screen: Screen) {
         // Manually divide text into lines to fix line break bugs
         const maxLength = this.width - TEXT_PADDING * 2 - MAX_ERRORS;
 

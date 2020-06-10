@@ -23,6 +23,7 @@
     },
     "homepage": "https://github.com/arvidsat/typessh#readme",
     "dependencies": {
+        "bcrypt": "^5.0.0",
         "blessed": "^0.1.81",
         "dotenv": "^8.2.0",
         "mongoose": "^5.9.18",

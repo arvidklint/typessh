@@ -1,5 +1,6 @@
 import { Connection, AuthContext } from 'ssh2';
 import Client from './Client';
+import { login } from './controllers/user';
 
 export default class Game {
     private clients: Client[] = [];
@@ -13,24 +14,29 @@ export default class Game {
     }
 
     public newClient(client: Connection): void {
-        // TODO: Create a proper unique ID
-        const clientId = Math.floor(Math.random() * 10000);
+        let username: string;
         client
-            .on('authentication', (ctx: AuthContext) => {
-                ctx.accept();
+            .on('authentication', async (ctx: AuthContext) => {
+                if (ctx.method !== 'keyboard-interactive')
+                    return ctx.reject(['keyboard-interactive']);
+
+                if (await login(ctx)) {
+                    return ctx.accept();
+                }
+                return ctx.reject();
             })
             .on('ready', () => {
-                console.log('New Client:', clientId);
-                this.clients.push(new Client(clientId, client));
+                console.log('New Client:', username);
+                // this.clients.push(new Client(username, client));
             })
             .on('end', () => {
                 const index = this.clients.findIndex(
-                    (client) => client.id === clientId
+                    (client) => client.id === username
                 );
                 if (index !== -1) {
                     this.clients.splice(index, 1);
                 }
-                console.log('Client disconnected:', clientId);
+                console.log('Client disconnected:', username);
             })
             .on('error', (error) => {
                 console.log(error);
