@@ -3,6 +3,7 @@ import { Connection } from 'ssh2';
 import Text from './Text';
 import Screen from './Screen';
 import Race from './Race';
+import { IUser } from './db/models/User';
 
 function noop() {}
 
@@ -14,7 +15,7 @@ export default class Client {
     private rows: number = 24;
     private term: string = 'ansi';
 
-    constructor(public id: number, private conn: Connection) {
+    constructor(public user: IUser, private conn: Connection) {
         this.listen();
     }
 
@@ -22,7 +23,6 @@ export default class Client {
         this.conn.once('session', (sessionAccept) => {
             sessionAccept()
                 .once('pty', (ptyAccept: any, _: any, info: any) => {
-                    console.log('pty');
                     this.rows = info.rows || 24;
                     this.cols = info.cols || 80;
                     this.term = info.term || 'ansi';
@@ -40,11 +40,10 @@ export default class Client {
                         cols: this.cols,
                         term: this.term,
                     });
-                    this.text = new Text(this.id, this.screen);
+                    this.text = new Text(this.user.username, this.screen);
                     this.screen.append(this.text.box);
                     this.race = new Race(this.screen);
                     this.screen.append(this.race.box);
-                    console.log('shelling');
                     this.screen.render();
                 });
         });
@@ -52,7 +51,7 @@ export default class Client {
 
     public sharedData(): SharedClientData {
         return {
-            name: this.id.toString(),
+            name: this.user.username,
             percentage: this.text.percentage(),
         };
     }
