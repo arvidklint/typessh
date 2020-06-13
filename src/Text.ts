@@ -20,8 +20,13 @@ export default class Text {
     private currentCol: number = 0;
     private errorString: string = '';
     private startTime: number = 0;
+    private lastCompleted: boolean = false;
 
-    constructor(public readonly id: string, private screen: Screen) {
+    constructor(
+        public readonly id: string,
+        private screen: Screen,
+        private reportScore: Function
+    ) {
         // Manually divide text into lines to fix line break bugs
         const maxLength = this.width - TEXT_MARGIN * 2 - MAX_ERRORS;
 
@@ -47,6 +52,7 @@ export default class Text {
         this.box = blessed.box({
             screen: this.screen.screen,
             top: 5,
+            height: 12,
             left: HORIZONTAL_MARGIN,
             right: HORIZONTAL_MARGIN,
         });
@@ -65,6 +71,17 @@ export default class Text {
             left: TEXT_MARGIN,
             right: TEXT_MARGIN,
             height: this.stringLines.length,
+        });
+
+        // footer
+        blessed.box({
+            parent: this.box,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            height: 1,
+            type: 'line',
+            content: ''.padEnd(this.width, '—'),
         });
 
         this.lines = this.stringLines.map((str, index) => {
@@ -164,7 +181,10 @@ export default class Text {
                     '—'
                 )
         );
-        this.score.setContent(`WPM: ${this.wpm()}`);
+        const wpm = this.wpm();
+        if (this.completed && !this.lastCompleted) this.reportScore(wpm);
+        this.lastCompleted = this.completed;
+        this.score.setContent(`WPM: ${wpm}`);
         if (this.completed) {
             this.scoreBox.show();
         } else {
@@ -178,6 +198,7 @@ export default class Text {
         this.startTime = 0;
         this.errorString = '';
         this.currentCol = 0;
+        this.lastCompleted = false;
         this.render();
     }
 

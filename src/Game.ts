@@ -2,10 +2,12 @@ import { Connection, AuthContext } from 'ssh2';
 import Client from './Client';
 import { handleLogin } from './controllers/user';
 import { IUser } from './db/models/User';
+import Record from './db/models/Record';
 
 export default class Game {
     private clients: Client[] = [];
     private intervalId: NodeJS.Timeout;
+    private highscoreThrottlingCheck: boolean = true;
 
     constructor() {
         this.intervalId = setInterval(() => {
@@ -21,7 +23,7 @@ export default class Game {
                 if (ctx.method !== 'keyboard-interactive')
                     return ctx.reject(['keyboard-interactive']);
 
-                user = await handleLogin(ctx)
+                user = await handleLogin(ctx);
                 if (user) {
                     return ctx.accept();
                 }
@@ -29,7 +31,13 @@ export default class Game {
             })
             .on('ready', () => {
                 console.log('New Client:', user.username);
-                this.clients.push(new Client(user, client));
+                this.clients.push(
+                    new Client(
+                        user,
+                        client,
+                        this.updateGlobalHighscore.bind(this)
+                    )
+                );
             })
             .on('end', () => {
                 const index = this.clients.findIndex(
@@ -43,6 +51,24 @@ export default class Game {
             .on('error', (error) => {
                 console.log(error);
             });
+    }
+
+    private updateGlobalHighscore() {
+        if (this.highscoreThrottlingCheck) {
+            Record.find()
+                .sort({ wpm: -1 })
+                .limit(10)
+                .then((items) => {
+                    this.clients.forEach((client) =>
+                        client.setGlobalHighscore(items)
+                    );
+                })
+                .catch(console.error);
+            this.highscoreThrottlingCheck = false;
+            setTimeout(() => {
+                this.highscoreThrottlingCheck = true;
+            }, 5000);
+        }
     }
 
     private update() {
