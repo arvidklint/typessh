@@ -2,7 +2,6 @@ import { Connection } from 'ssh2';
 
 import Text from './Text';
 import Screen from './Screen';
-import Race from './Race';
 import { IUser } from './db/models/User';
 
 function noop() {}
@@ -10,7 +9,6 @@ function noop() {}
 export default class Client {
     private text: Text | null = null;
     private screen: Screen | null = null;
-    private race: Race;
     private cols: number = 80;
     private rows: number = 24;
     private term: string = 'ansi';
@@ -42,8 +40,6 @@ export default class Client {
                     });
                     this.text = new Text(this.user.username, this.screen);
                     this.screen.append(this.text.box);
-                    this.race = new Race(this.screen);
-                    this.screen.append(this.race.box);
                     this.screen.render();
                 });
         });
@@ -56,9 +52,7 @@ export default class Client {
         };
     }
 
-    public update(dataArray: SharedClientData[]) {
-        this.race.update(dataArray);
-    }
+    public update(dataArray: SharedClientData[]) {}
 
     public render() {
         this.screen.render();
