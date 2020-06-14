@@ -161,15 +161,16 @@ export default class Text {
         this.stringLines.forEach((line, index) => {
             this.lines[index].setContent(this.formatLine(line, index));
         });
-        const TITLE = '——[ TypeSSH ]';
+        const wpm = this.wpm();
+        const wpmTitleString = ` WPM: ${wpm} `.padEnd(10, ' ');
+        const TITLE = `——[${wpmTitleString}]`;
         this.header.setContent(
             TITLE +
-                `/ WPM: ${this.wpm()} /——`.padStart(
+                `/ TypiSSHt /——`.padStart(
                     this.width - TITLE.length,
                     '—'
                 )
         );
-        const wpm = this.wpm();
         if (this.completed && !this.lastCompleted) this.reportScore(wpm);
         this.lastCompleted = this.completed;
         this.score.setContent(`WPM: ${wpm}`);
