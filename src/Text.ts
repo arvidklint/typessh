@@ -31,11 +31,9 @@ export default class Text {
         private screen: Screen,
         private reportScore: Function
     ) {
-        this.maxLineWidth = this.width - TEXT_MARGIN * 2 - MAX_ERRORS;
+        this.maxLineWidth = this.width - TEXT_MARGIN * 2 - MAX_ERRORS - 2;
 
-        for (let i = 0; i < 3; i++) {
-            this.stringLines.push(this.createLine());
-        }
+        this.stringLines = this.createText();
 
         this.box = blessed.box({
             screen: this.screen.screen,
@@ -165,11 +163,7 @@ export default class Text {
         const wpmTitleString = ` WPM: ${wpm} `.padEnd(10, ' ');
         const TITLE = `——[${wpmTitleString}]`;
         this.header.setContent(
-            TITLE +
-                `/ TypiSSHt /——`.padStart(
-                    this.width - TITLE.length,
-                    '—'
-                )
+            TITLE + `/ TypiSSHt /——`.padStart(this.width - TITLE.length, '—')
         );
         if (this.completed && !this.lastCompleted) this.reportScore(wpm);
         this.lastCompleted = this.completed;
@@ -188,6 +182,7 @@ export default class Text {
         this.errorString = '';
         this.currentCol = 0;
         this.lastCompleted = false;
+        this.stringLines = this.createText();
         this.render();
     }
 
@@ -265,8 +260,17 @@ export default class Text {
         let text = rword();
         do {
             const word = rword();
-            text = `${text} ${word}`
+            text = `${text} ${word}`;
         } while (text.length < this.maxLineWidth);
-        return text;
+        return `${text} `;
+    }
+
+    private createText(): string[] {
+        const lines = [];
+        for (let i = 0; i < 3; i++) {
+            lines.push(this.createLine());
+        }
+        lines[lines.length - 1] = lines[lines.length - 1].trim();
+        return lines;
     }
 }
