@@ -197,6 +197,10 @@ export default class Text {
 
         this.render();
         this.screen.screen.on('keypress', (key, keyInfo) => {
+            if (!/[a-zA-Z0-9\ \']/.test(key) && keyInfo.name !== 'backspace') {
+                return;
+            }
+
             if (!this.started) this.startTime = Date.now();
 
             if (this.currentLine > this.stringLines.length - 1) return;
@@ -205,7 +209,7 @@ export default class Text {
                 if (this.errorString.length !== 0) {
                     this.errorString = this.errorString.slice(0, -1);
                 } else {
-                    this.currentCol--;
+                    this.currentCol = Math.max(this.currentCol - 1, 0);
                 }
                 this.render();
                 return;

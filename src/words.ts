@@ -8,7 +8,7 @@ const rl = readline.createInterface({
 
 const words: string[] = [];
 rl.on('line', (line) => {
-    words.push(line)
+    words.push(line);
 });
 
 export default words;
