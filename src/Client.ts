@@ -1,4 +1,5 @@
 import { Connection } from 'ssh2';
+import blessed from 'blessed';
 
 import Text from './Text';
 import Screen from './Screen';
@@ -14,6 +15,7 @@ export default class Client {
     private cols: number = 80;
     private rows: number = 24;
     private term: string = 'ansi';
+    private highscoreBox: blessed.Widgets.BoxElement;
     private personalHighScore: Highscore | null = null;
     private globalHighScore: Highscore | null = null;
 
@@ -53,30 +55,46 @@ export default class Client {
                     );
                     this.screen.append(this.text.box);
 
-                    this.personalHighScore = new Highscore(
-                        this.screen,
-                        'Personal'
-                    );
+                    this.highscoreBox = blessed.box({
+                        left: 'center',
+                        top: 15,
+                        width: 44,
+                    });
+                    this.screen.append(this.highscoreBox);
+
+                    this.personalHighScore = new Highscore(this.screen, {
+                        parent: this.highscoreBox,
+                        label: 'Personal',
+                    });
                     Record.find({ username: this.user.username })
                         .sort({ wpm: -1 })
                         .limit(10)
                         .then((items) => {
                             this.personalHighScore.setItems(items);
                         });
-                    this.screen.append(this.personalHighScore.box);
 
-                    this.globalHighScore = new Highscore(
-                        this.screen,
-                        'Global',
-                        true
-                    );
+                    blessed.box({
+                        parent: this.highscoreBox,
+                        left: 20,
+                        top: 0,
+                        width: 1,
+                        type: 'line',
+                        content: '\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n|\n',
+                    });
+
+                    this.globalHighScore = new Highscore(this.screen, {
+                        parent: this.highscoreBox,
+                        label: 'Global',
+                        left: 21,
+                        top: 0,
+                        showName: true,
+                    });
                     Record.find()
                         .sort({ wpm: -1 })
                         .limit(10)
                         .then((items) => {
                             this.setGlobalHighscore(items);
                         });
-                    this.screen.append(this.globalHighScore.box);
 
                     this.screen.render();
                 });
