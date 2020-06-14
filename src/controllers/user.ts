@@ -13,9 +13,10 @@ const MIN_USERNAME_LENGTH = 3;
 const MIN_PASSWORD_LENGTH = 1;
 const MAX_PASSWORD_LENGTH = 256;
 
-const ENTER_USERNAME_PROMPT = 'Enter username: ';
-const ENTER_PASSWORD_PROMPT = 'Enter password: ';
-const ENTER_NEW_PASSWORD_PROMPT = 'Enter new password: ';
+const ENTER_USERNAME_PROMPT =
+    'Enter existing username or the one you want to create\n - ';
+const ENTER_PASSWORD_PROMPT = 'Enter password ';
+const ENTER_NEW_PASSWORD_PROMPT = 'Enter new password ';
 
 const PASSWORD_ATTEMPTS = 3;
 
@@ -25,7 +26,7 @@ function prompt(text: string, ctx: AuthContext, echo: boolean = true) {
         ctx.prompt({ prompt: text, echo }, (answers: string[]) => {
             resolve(answers);
         });
-    })
+    });
 }
 
 function validateUsername(name: string): ValidationResult {
@@ -44,15 +45,15 @@ function validateUsername(name: string): ValidationResult {
     if (!/^[a-zA-Z0-9]+$/.test(name)) {
         return {
             valid: false,
-            reason: 'invalid username! Valid characters are a-z, A-Z, 0-9.'
-        }
+            reason: 'invalid username! Valid characters are a-z, A-Z, 0-9.',
+        };
     }
 
     return {
         valid: true,
         reason: 'Username is valid!',
     };
-};
+}
 
 function validatePassword(password: string): ValidationResult {
     if (password.length === 0) {
@@ -71,7 +72,7 @@ function validatePassword(password: string): ValidationResult {
         valid: true,
         reason: 'Password is valid!',
     };
-};
+}
 
 async function getUsername(ctx: AuthContext): Promise<string> {
     try {
@@ -79,20 +80,25 @@ async function getUsername(ctx: AuthContext): Promise<string> {
             const username = answers[0];
             const validation = validateUsername(username);
             if (!validation.valid) {
-                const answers = await prompt(`${validation.reason}\n${ENTER_USERNAME_PROMPT}`, ctx);
+                const answers = await prompt(
+                    `${validation.reason}\n${ENTER_USERNAME_PROMPT}`,
+                    ctx
+                );
                 return promptForUsername(answers);
             }
             return answers[0];
         };
 
-        const answers = await prompt(`Welcome to TypiSSHt!\n${ENTER_USERNAME_PROMPT}`, ctx);
+        const answers = await prompt(
+            `Welcome to TypiSSHt!\n${ENTER_USERNAME_PROMPT}`,
+            ctx
+        );
         return await promptForUsername(answers);
     } catch (e) {
         log.error(e);
-        throw(e);
+        throw e;
     }
 }
-
 
 async function createUser(ctx: AuthContext, username: string): Promise<IUser> {
     try {
@@ -100,13 +106,21 @@ async function createUser(ctx: AuthContext, username: string): Promise<IUser> {
             const password = answers[0];
             const validation = validatePassword(password);
             if (!validation.valid) {
-                const answers = await prompt(`${validation.reason}\n${ENTER_NEW_PASSWORD_PROMPT}`, ctx, false);
+                const answers = await prompt(
+                    `${validation.reason}\n${ENTER_NEW_PASSWORD_PROMPT}`,
+                    ctx,
+                    false
+                );
                 return promptForNewPassword(answers);
             }
             return password;
-        }
+        };
 
-        const answers = await prompt(`${ENTER_NEW_PASSWORD_PROMPT}`, ctx, false);
+        const answers = await prompt(
+            `${ENTER_NEW_PASSWORD_PROMPT}`,
+            ctx,
+            false
+        );
         const password = await promptForNewPassword(answers);
 
         const salt = await bcrypt.genSalt(10);
@@ -119,13 +133,16 @@ async function createUser(ctx: AuthContext, username: string): Promise<IUser> {
         return user;
     } catch (e) {
         log.error(e);
-        throw (e);
+        throw e;
     }
 }
 
 async function checkPassword(ctx: AuthContext, user: IUser): Promise<boolean> {
     try {
-        const checkAndPrompt = async (answers: string[], attemptsLeft: number): Promise<boolean> => {
+        const checkAndPrompt = async (
+            answers: string[],
+            attemptsLeft: number
+        ): Promise<boolean> => {
             if (attemptsLeft <= 0) {
                 return false;
             }
@@ -134,7 +151,11 @@ async function checkPassword(ctx: AuthContext, user: IUser): Promise<boolean> {
             if (check) {
                 return true;
             }
-            const newAnswers = await prompt(`Incorrect password (attempts left: ${attemptsLeft})\n${ENTER_PASSWORD_PROMPT}`, ctx, false);
+            const newAnswers = await prompt(
+                `Incorrect password (attempts left: ${attemptsLeft})\n${ENTER_PASSWORD_PROMPT}`,
+                ctx,
+                false
+            );
             return checkAndPrompt(newAnswers, attemptsLeft - 1);
         };
 
@@ -143,7 +164,7 @@ async function checkPassword(ctx: AuthContext, user: IUser): Promise<boolean> {
         return check;
     } catch (e) {
         log.error(e);
-        throw (e);
+        throw e;
     }
 }
 
@@ -164,7 +185,10 @@ export async function handleLogin(ctx: AuthContext): Promise<IUser> {
 
         const user = await User.findOne({ username });
         if (!user) {
-            const answers = await prompt(`Username does not exist. Do you want to create it? (y/N): `, ctx);
+            const answers = await prompt(
+                `Username does not exist. Do you want to create it? (y/N): `,
+                ctx
+            );
             const answer = answers[0];
             if (answer === 'y' || answer === 'Y') {
                 return await createUser(ctx, username);

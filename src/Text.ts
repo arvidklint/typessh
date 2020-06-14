@@ -31,7 +31,7 @@ export default class Text {
     private maxLineWidth: number;
 
     constructor(
-        public readonly id: string,
+        private readonly username: string,
         private screen: Screen,
         private reportScore: Function
     ) {
@@ -169,7 +169,11 @@ export default class Text {
         const wpmTitleString = ` WPM: ${wpm} `.padEnd(10, ' ');
         const TITLE = `——[${wpmTitleString}]`;
         this.header.setContent(
-            TITLE + `/ TypiSSHt /——`.padStart(this.width - TITLE.length, '—')
+            TITLE +
+                `/ ${this.username} /——`.padStart(
+                    this.width - TITLE.length,
+                    '—'
+                )
         );
         if (this.completed && !this.lastCompleted) this.reportScore(wpm);
         this.lastCompleted = this.completed;
@@ -264,10 +268,11 @@ export default class Text {
 
     private createLine(): string {
         let text = rword();
+        let word = rword();
         do {
-            const word = rword();
             text = `${text} ${word}`;
-        } while (text.length < this.maxLineWidth);
+            word = rword();
+        } while (`${text} ${word}`.length < this.maxLineWidth);
         return `${text} `;
     }
 
