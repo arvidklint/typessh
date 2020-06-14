@@ -1,12 +1,14 @@
 import blessed from 'blessed';
 import Screen from './Screen';
-
-const TEXT =
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
+import words from './words';
 
 const MAX_ERRORS = 5;
 const HORIZONTAL_MARGIN = 3;
 const TEXT_MARGIN = 2;
+
+function rword() {
+    return words[Math.floor(Math.random() * words.length)];
+}
 
 export default class Text {
     public box: blessed.Widgets.BoxElement;
@@ -21,38 +23,24 @@ export default class Text {
     private errorString: string = '';
     private startTime: number = 0;
     private lastCompleted: boolean = false;
+    private text: string = '';
+    private maxLineWidth: number;
 
     constructor(
         public readonly id: string,
         private screen: Screen,
         private reportScore: Function
     ) {
-        // Manually divide text into lines to fix line break bugs
-        const maxLength = this.width - TEXT_MARGIN * 2 - MAX_ERRORS;
+        this.maxLineWidth = this.width - TEXT_MARGIN * 2 - MAX_ERRORS;
 
-        this.stringLines = TEXT.split(' ').reduce(
-            (acc: Array<string>, word: string) => {
-                const i = Math.max(0, acc.length - 1);
-                if (!acc[i]) {
-                    acc[i] = '';
-                }
-                if (acc[i].length + word.length > maxLength) {
-                    acc[i] += ' ';
-                    return [...acc, word];
-                }
-
-                if (acc[i].length === 0) acc[i] = word;
-                else acc[i] = `${acc[i]} ${word}`;
-
-                return acc;
-            },
-            []
-        );
+        for (let i = 0; i < 3; i++) {
+            this.stringLines.push(this.createLine());
+        }
 
         this.box = blessed.box({
             screen: this.screen.screen,
             top: 5,
-            height: 12,
+            height: 9,
             left: HORIZONTAL_MARGIN,
             right: HORIZONTAL_MARGIN,
         });
@@ -67,7 +55,7 @@ export default class Text {
 
         this.body = blessed.box({
             parent: this.box,
-            top: 2,
+            top: 3,
             left: TEXT_MARGIN,
             right: TEXT_MARGIN,
             height: this.stringLines.length,
@@ -99,10 +87,10 @@ export default class Text {
 
         this.scoreBox = blessed.box({
             parent: this.box,
-            top: 2,
+            top: 1,
             left: 'center',
             width: 25,
-            height: 6,
+            height: 7,
             align: 'center',
             valign: 'middle',
             border: 'line',
@@ -120,7 +108,7 @@ export default class Text {
 
         blessed.box({
             parent: this.scoreBox,
-            top: 3,
+            top: 4,
             left: 0,
             right: 0,
             align: 'center',
@@ -250,7 +238,7 @@ export default class Text {
             completed += this.stringLines[i].length;
         }
         const total = this.currentCol + completed;
-        return total / TEXT.length;
+        return total / this.text.length;
     }
 
     private wpm(): number {
@@ -266,5 +254,14 @@ export default class Text {
                 .substring(0, this.currentCol)
                 .split(' ').length - 1;
         return Math.round(((wordCount * 1000) / deltaTime) * 60);
+    }
+
+    private createLine(): string {
+        let text = rword();
+        do {
+            const word = rword();
+            text = `${text} ${word}`
+        } while (text.length < this.maxLineWidth);
+        return text;
     }
 }

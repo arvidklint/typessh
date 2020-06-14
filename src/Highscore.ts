@@ -49,15 +49,18 @@ export default class Highscore {
 
     public setItems(items: IRecord[]) {
         this.items = items;
+        // @ts-ignore
         this.list.setItems(this.formatItems(items));
         this.screen.render();
     }
 
     public considerItem(item: IRecord) {
         const newItems = [...this.items, item].sort((a, b) => {
+            // @ts-ignore
             return b.wpm - a.wpm;
         });
         this.items = newItems;
+        // @ts-ignore
         this.list.setItems(this.formatItems(newItems));
         this.screen.render();
     }

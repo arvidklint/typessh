@@ -3,13 +3,18 @@
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
+    "watch": {
+        "copy-assets": "./src/assets/**/*"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
-        "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"blue.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
+        "dev": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node,Watch\" -c \"blue.bold,green.bold,yellow.bold\" \"npm run watch-ts\" \"npm run watch-node\" \"npm run watch\"",
         "watch-ts": "tsc -w",
         "watch-node": "nodemon -r dotenv/config dist/main.js",
+        "copy-assets": "mkdir -p ./dist/assets && cp -R ./src/assets ./dist/assets/",
         "build": "tsc",
-        "start": "node -r dotenv/config dist/main.js"
+        "start": "node -r dotenv/config dist/main.js",
+        "watch": "npm-watch"
     },
     "repository": {
         "type": "git",
@@ -48,6 +53,7 @@
         "husky": "^4.2.5",
         "lint-staged": "^10.2.8",
         "nodemon": "^2.0.4",
+        "npm-watch": "^0.6.0",
         "prettier": "^2.0.5",
         "typescript": "^3.9.3"
     }
