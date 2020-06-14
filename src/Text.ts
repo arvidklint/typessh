@@ -10,6 +10,10 @@ function rword() {
     return words[Math.floor(Math.random() * words.length)];
 }
 
+function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+}
+
 export default class Text {
     public box: blessed.Widgets.BoxElement;
     private header: blessed.Widgets.BoxElement;
@@ -31,14 +35,15 @@ export default class Text {
         private screen: Screen,
         private reportScore: Function
     ) {
-        this.maxLineWidth = this.width - TEXT_MARGIN * 2 - MAX_ERRORS - 2;
+        const bodyWidth = clamp(this.width - TEXT_MARGIN * 2, 30, 70);
+        this.maxLineWidth = bodyWidth - MAX_ERRORS - 2;
 
         this.stringLines = this.createText();
 
         this.box = blessed.box({
             screen: this.screen.screen,
-            top: 5,
-            height: 9,
+            top: 4,
+            height: 10,
             left: HORIZONTAL_MARGIN,
             right: HORIZONTAL_MARGIN,
         });
@@ -74,9 +79,10 @@ export default class Text {
             return blessed.box({
                 parent: this.body,
                 top: index,
-                left: 0,
+                left: 'center',
                 right: 0,
                 align: 'left',
+                width: bodyWidth,
                 type: 'line',
                 tags: true,
                 content: str,
@@ -88,7 +94,7 @@ export default class Text {
             top: 1,
             left: 'center',
             width: 25,
-            height: 7,
+            height: 8,
             align: 'center',
             valign: 'middle',
             border: 'line',
@@ -96,7 +102,7 @@ export default class Text {
 
         this.score = blessed.box({
             parent: this.scoreBox,
-            top: 1,
+            top: 2,
             left: 0,
             right: 0,
             align: 'center',
@@ -106,7 +112,7 @@ export default class Text {
 
         blessed.box({
             parent: this.scoreBox,
-            top: 4,
+            top: 5,
             left: 0,
             right: 0,
             align: 'center',
@@ -267,7 +273,7 @@ export default class Text {
 
     private createText(): string[] {
         const lines = [];
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < 4; i++) {
             lines.push(this.createLine());
         }
         lines[lines.length - 1] = lines[lines.length - 1].trim();
