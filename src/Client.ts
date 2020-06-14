@@ -98,8 +98,8 @@ export default class Client {
 
     public sharedData(): SharedClientData {
         return {
-            name: this.user.username,
-            percentage: this.text.percentage(),
+            name: this.user?.username || '',
+            percentage: this.text?.percentage() || 0,
         };
     }
 
