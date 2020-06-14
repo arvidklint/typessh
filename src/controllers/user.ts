@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
 import { AuthContext } from 'ssh2';
 import User, { IUser } from '../db/models/User';
+import log from '../log';
 
 type ValidationResult = {
     valid: boolean;
@@ -87,7 +88,7 @@ async function getUsername(ctx: AuthContext): Promise<string> {
         const answers = await prompt(`Welcome to TypiSSHt!\n${ENTER_USERNAME_PROMPT}`, ctx);
         return await promptForUsername(answers);
     } catch (e) {
-        console.error(e);
+        log.error(e);
         throw(e);
     }
 }
@@ -117,7 +118,7 @@ async function createUser(ctx: AuthContext, username: string): Promise<IUser> {
         const user = await newUser.save();
         return user;
     } catch (e) {
-        console.error(e)
+        log.error(e);
         throw (e);
     }
 }
@@ -141,7 +142,7 @@ async function checkPassword(ctx: AuthContext, user: IUser): Promise<boolean> {
         const check = await checkAndPrompt(answers, PASSWORD_ATTEMPTS - 1);
         return check;
     } catch (e) {
-        console.error(e);
+        log.error(e);
         throw (e);
     }
 }
@@ -175,6 +176,6 @@ export async function handleLogin(ctx: AuthContext): Promise<IUser> {
         if (check) return user;
         return null;
     } catch (e) {
-        console.error(e);
+        log.error(e);
     }
 }

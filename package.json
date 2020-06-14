@@ -32,6 +32,7 @@
         "blessed": "^0.1.81",
         "dotenv": "^8.2.0",
         "mongoose": "^5.9.18",
+        "simple-node-logger": "^18.12.24",
         "ssh2": "^0.8.9"
     },
     "husky": {

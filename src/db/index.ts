@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import log from '../log';
 
 mongoose.connect(process.env.DB_URL, {
     useNewUrlParser: true,
@@ -6,5 +7,5 @@ mongoose.connect(process.env.DB_URL, {
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function () {
-    console.log('database connected');
+    log.info('Database connected');
 });

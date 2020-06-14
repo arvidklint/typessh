@@ -3,6 +3,7 @@ import Client from './Client';
 import { handleLogin } from './controllers/user';
 import { IUser } from './db/models/User';
 import Record from './db/models/Record';
+import log from './log';
 
 export default class Game {
     private clients: Client[] = [];
@@ -30,7 +31,7 @@ export default class Game {
                 return ctx.reject();
             })
             .on('ready', () => {
-                console.log('New Client:', user.username);
+                log.info('Client logged in: ', user.username);
                 this.clients.push(
                     new Client(
                         user,
@@ -46,10 +47,10 @@ export default class Game {
                 if (index !== -1) {
                     this.clients.splice(index, 1);
                 }
-                console.log('Client disconnected:', user.username);
+                log.info('Client disconnected: ', user.username);
             })
             .on('error', (error) => {
-                console.log(error);
+                log.error(error);
             });
     }
 
@@ -63,7 +64,7 @@ export default class Game {
                         client.setGlobalHighscore(items)
                     );
                 })
-                .catch(console.error);
+                .catch(log.error);
             this.highscoreThrottlingCheck = false;
             setTimeout(() => {
                 this.highscoreThrottlingCheck = true;
