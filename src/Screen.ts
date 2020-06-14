@@ -21,7 +21,7 @@ export default class Screen {
         });
         this.screen.title = 'TypeSSH';
         this.screen.program.disableMouse();
-        this.screen.key(['escape'], () => {
+        this.screen.key(['C-c'], () => {
             stream.exit(0);
             stream.end();
         });
