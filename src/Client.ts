@@ -104,15 +104,15 @@ export default class Client {
         });
     }
 
-    private reportScore(wpm: number) {
+    private async reportScore(wpm: number) {
         const record = new Record({
             username: this.user.username,
             wpm,
         });
 
-        record.save();
-
         this.personalHighScore.considerItem(record);
+
+        await record.save();
 
         this.updateGlobalHighscore();
     }

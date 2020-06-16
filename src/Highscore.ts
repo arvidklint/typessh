@@ -69,7 +69,9 @@ export default class Highscore {
 
     private formatItem(item: IRecord | null, index: number) {
         const place = ` ${index} ${
-            this.options.showName ? `(${item.username.substring(0, 8)})` : ''
+            this.options.showName && item
+                ? `(${item.username.substring(0, 8)})`
+                : ''
         }`;
         if (!item) return `${place}`.padEnd(this.options.width - 3, '_');
         const wpmString = item.wpm.toString();
