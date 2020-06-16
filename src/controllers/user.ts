@@ -30,6 +30,12 @@ function prompt(text: string, ctx: AuthContext, echo: boolean = true) {
 }
 
 function validateUsername(name: string): ValidationResult {
+    if (!name) {
+        return {
+            valid: false,
+            reason: 'No username',
+        };
+    }
     if (name.length < MIN_USERNAME_LENGTH) {
         return {
             valid: false,
@@ -56,6 +62,12 @@ function validateUsername(name: string): ValidationResult {
 }
 
 function validatePassword(password: string): ValidationResult {
+    if (!password) {
+        return {
+            valid: false,
+            reason: 'No password',
+        };
+    }
     if (password.length === 0) {
         return {
             valid: false,
