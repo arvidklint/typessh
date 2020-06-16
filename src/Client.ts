@@ -1,6 +1,7 @@
 import { Connection } from 'ssh2';
 import blessed from 'blessed';
 
+import log from './log';
 import Text from './Text';
 import Screen from './Screen';
 import Highscore from './Highscore';
@@ -42,7 +43,9 @@ export default class Client {
                     stream.columns = this.cols;
                     stream.isTTY = true;
                     stream.setRawMode = noop;
-                    stream.on('error', noop);
+                    stream.on('error', (e) => {
+                        log.error(e);
+                    });
                     this.screen = new Screen(stream, {
                         rows: this.rows,
                         cols: this.cols,
