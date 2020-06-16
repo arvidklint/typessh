@@ -31,7 +31,8 @@ export default class Game {
                 return ctx.reject();
             })
             .on('ready', () => {
-                log.info('Client logged in: ', user.username);
+                log.info('Client logged in: ', user && user.username);
+                if (!client) return;
                 this.clients.push(
                     new Client(
                         user,
@@ -41,6 +42,7 @@ export default class Game {
                 );
             })
             .on('end', () => {
+                if (!user) return;
                 const index = this.clients.findIndex(
                     (client) => client.user.username === user.username
                 );
