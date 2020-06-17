@@ -60,7 +60,7 @@ export default class Client {
 
                     this.highscoreBox = blessed.box({
                         left: 'center',
-                        top: 15,
+                        top: 12,
                         width: 44,
                     });
                     this.screen.append(this.highscoreBox);

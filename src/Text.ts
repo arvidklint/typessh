@@ -42,7 +42,7 @@ export default class Text {
 
         this.box = blessed.box({
             screen: this.screen.screen,
-            top: 4,
+            top: 1,
             height: 10,
             left: HORIZONTAL_MARGIN,
             right: HORIZONTAL_MARGIN,
