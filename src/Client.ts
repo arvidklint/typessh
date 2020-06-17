@@ -99,7 +99,7 @@ export default class Client {
                             this.setGlobalHighscore(items);
                         });
 
-                    this.screen.render();
+                    this.render();
                 });
         });
     }
@@ -127,6 +127,7 @@ export default class Client {
     public update(dataArray: SharedClientData[]) {}
 
     public render() {
+        if (!this.screen) return;
         this.screen.render();
     }
 
